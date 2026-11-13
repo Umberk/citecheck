@@ -1,0 +1,81 @@
+import type { ThemeConfig } from "antd";
+
+export const palette = {
+  brand: "#1d3fae",
+  brandHover: "#3457d6",
+  brandSoft: "#eff3ff",
+  ink: "#0f172a",
+  ink2: "#334155",
+  ink3: "#64748b",
+  ink4: "#94a3b8",
+  line: "#e4e7ec",
+  lineStrong: "#d0d5dd",
+  canvas: "#f6f7f9",
+  subtle: "#f1f3f6",
+  ok: "#12805c",
+  warn: "#b54708",
+  bad: "#c82d20",
+  info: "#026aa2",
+};
+
+export const chartColors: Record<string, string> = {
+  b1: "#94a3b8",
+  b2: "#60a5fa",
+  b3: "#6366f1",
+  full: "#1d3fae",
+  no_planner: "#14b8a6",
+  embedding_only: "#f59e0b",
+  no_verifier: "#e11d48",
+};
+
+export const antdTheme: ThemeConfig = {
+  cssVar: true,
+  hashed: false,
+  token: {
+    colorPrimary: palette.brand,
+    colorInfo: palette.brand,
+    colorSuccess: palette.ok,
+    colorWarning: palette.warn,
+    colorError: palette.bad,
+    colorText: palette.ink,
+    colorTextSecondary: palette.ink3,
+    colorTextTertiary: palette.ink4,
+    colorBorder: palette.lineStrong,
+    colorBorderSecondary: palette.line,
+    colorBgLayout: palette.canvas,
+    colorFillTertiary: palette.subtle,
+    fontFamily:
+      'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+    fontSize: 14,
+    borderRadius: 6,
+    borderRadiusLG: 10,
+    borderRadiusSM: 4,
+    controlHeight: 34,
+    controlHeightSM: 28,
+    controlHeightLG: 40,
+    wireframe: false,
+    boxShadow: "0 6px 16px -4px rgb(15 23 42 / 0.1), 0 2px 4px -2px rgb(15 23 42 / 0.06)",
+    boxShadowSecondary:
+      "0 18px 40px -12px rgb(15 23 42 / 0.18), 0 4px 10px -4px rgb(15 23 42 / 0.08)",
+    motionDurationMid: "0.16s",
+  },
+  components: {
+    Button: {
+      fontWeight: 500,
+      primaryShadow: "none",
+      defaultShadow: "none",
+      dangerShadow: "none",
+    },
+    Card: { paddingLG: 20 },
+    Table: { headerBg: "#fafbfc", rowHoverBg: "#f8f9fb", cellPaddingBlock: 12 },
+    Tabs: { horizontalItemGutter: 20, titleFontSize: 13 },
+    Segmented: { itemSelectedBg: "#ffffff", trackBg: "#eef0f4" },
+    Tooltip: { colorBgSpotlight: "#0f172a" },
+    Input: { activeShadow: "0 0 0 3px rgb(52 87 214 / 0.14)" },
+    Select: { optionSelectedBg: palette.brandSoft },
+    Menu: { itemBorderRadius: 6 },
+    Modal: { titleFontSize: 16 },
+    Drawer: { paddingLG: 20 },
+    Tag: { defaultBg: palette.subtle },
+  },
+};

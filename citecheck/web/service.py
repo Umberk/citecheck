@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import tempfile
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +13,9 @@ from citecheck.ingest import Chunk, parse_pdfs
 from citecheck.llm import ROOT, from_env
 from citecheck.retrieve import Retriever
 from citecheck.sample_docs import write_examples
+from citecheck.web.evidence import claim_chunk
+
+MAX_LIBRARIES = 4
 
 
 @dataclass
@@ -20,7 +24,14 @@ class Library:
     outline: list[dict]
 
 
-_libraries: dict[str, Library] = {}
+_libraries: OrderedDict[str, Library] = OrderedDict()
+
+
+def _remember(library_id: str, library: Library) -> None:
+    _libraries[library_id] = library
+    _libraries.move_to_end(library_id)
+    while len(_libraries) > MAX_LIBRARIES:
+        _libraries.popitem(last=False)
 
 
 def outline_from_chunks(chunks: list[Chunk]) -> list[dict]:
@@ -67,6 +78,7 @@ def result_payload(result: AgentResult) -> dict:
                 "section": claim.section,
                 "page": claim.page,
                 "paper_title": claim.paper_title,
+                "chunk_id": claim.chunk_id,
                 "evidence_index": _evidence_index(claim, result.evidence),
             }
             for claim in result.claims
@@ -74,6 +86,7 @@ def result_payload(result: AgentResult) -> dict:
         "evidence": [
             {
                 "id": index,
+                "chunk_id": chunk.chunk_id,
                 "paper_title": chunk.paper_title,
                 "section": chunk.section,
                 "page": chunk.page,
@@ -99,7 +112,7 @@ def index_sample(include_lite: bool) -> tuple[str, list[dict]]:
         if include_lite:
             paths.append(examples / "widgetnet_lite.pdf")
         cached = _library_from_paths(paths)
-        _libraries[library_id] = cached
+        _remember(library_id, cached)
     return library_id, cached.outline
 
 
@@ -121,7 +134,7 @@ def index_uploads(payloads: list[tuple[str, bytes]]) -> tuple[str, list[dict]]:
             path.write_bytes(data)
             paths.append(path)
         cached = _library_from_paths(paths)
-        _libraries[library_id] = cached
+        _remember(library_id, cached)
     return library_id, cached.outline
 
 
@@ -158,14 +171,10 @@ def _unique_name(name: str, used: set[str]) -> str:
 
 
 def _evidence_index(claim, evidence: list[Chunk]) -> int | None:
-    if not claim.evidence_text:
+    chunk = claim_chunk(claim, evidence)
+    if chunk is None:
         return None
-    for index, chunk in enumerate(evidence, start=1):
-        if (
-            chunk.text == claim.evidence_text
-            and chunk.section == claim.section
-            and chunk.page == claim.page
-            and chunk.paper_title == claim.paper_title
-        ):
+    for index, candidate in enumerate(evidence, start=1):
+        if candidate.chunk_id == chunk.chunk_id:
             return index
     return None

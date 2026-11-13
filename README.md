@@ -47,13 +47,16 @@ python -m citecheck.ask \
 
 `--system` 可选 `b1`、`b2`、`b3`、`full`，以及 `no_planner`、`embedding_only`、`no_verifier`。
 
-演示页：
+网页工作台：
 
 ```bash
+cd frontend && npm install && npm run build && cd ..
 python -m citecheck.web
 ```
 
-浏览器打开 http://127.0.0.1:8000 。可以上传 PDF，也可以使用示例论文。页面显示答案、每一句的核对结果、章节页码、检索流程和检索到的段落。顶栏可以切换中文和英文。
+浏览器打开 http://127.0.0.1:8000 ，会进入 `/app`。注册后可以上传 PDF 或导入示例论文，在 AI 阅读器里提问，并点击引用跳回 PDF。`/legacy` 仍是原来的单页演示。界面可以切换中文和英文。
+
+PDF 默认存在本机 `data/`。要改用腾讯云 COS，在 `.env` 填 `COS_SECRET_ID`、`COS_SECRET_KEY`、`COS_BUCKET`、`COS_REGION`，不要把密钥交给浏览器。单文件默认不超过 20MB，解析在后台一次只跑一篇。部署步骤见 [docs/DEPLOY.md](docs/DEPLOY.md)，课堂演示顺序见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
 
 ## 对照
 

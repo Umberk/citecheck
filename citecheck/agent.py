@@ -34,6 +34,7 @@ class VerifiedClaim:
     page: int | None = None
     paper_title: str | None = None
     evidence_text: str | None = None
+    chunk_id: str | None = None
 
 
 @dataclass
@@ -267,6 +268,7 @@ def _verify_sentence(sentence: str, evidence: list[Chunk], llm: LLMClient) -> Ve
             page=chunk.page if chunk else None,
             paper_title=chunk.paper_title if chunk else None,
             evidence_text=chunk.text if chunk else None,
+            chunk_id=chunk.chunk_id if chunk else None,
         )
     return VerifiedClaim(
         text=claim,
@@ -276,6 +278,7 @@ def _verify_sentence(sentence: str, evidence: list[Chunk], llm: LLMClient) -> Ve
         page=chunk.page,
         paper_title=chunk.paper_title,
         evidence_text=chunk.text,
+        chunk_id=chunk.chunk_id,
     )
 
 
@@ -325,6 +328,7 @@ def _claim_from_markers(sentence: str, evidence: list[Chunk]) -> VerifiedClaim:
         page=chunk.page,
         paper_title=chunk.paper_title,
         evidence_text=chunk.text,
+        chunk_id=chunk.chunk_id,
     )
 
 

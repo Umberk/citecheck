@@ -35,6 +35,11 @@ class Chunk:
     paragraph: int
     text: str
 
+    @property
+    def page_index(self) -> int | None:
+        """0-based page for PDF viewers; `page` stays 1-based for citations."""
+        return None if self.page is None else self.page - 1
+
 
 @dataclass
 class _Line:

@@ -1,21 +1,41 @@
-"""HTTP entry for the demo page."""
+"""HTTP entry: React workspace at /app, the original demo at /legacy, JSON APIs under /api."""
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from citecheck.agent import SYSTEMS
+from citecheck.web import config
+from citecheck.web.api import public_router, router as api_router
 from citecheck.web.service import ask, get_library, index_sample, index_uploads
 
 STATIC = Path(__file__).resolve().parent / "static"
 
-app = FastAPI(title="CiteCheck")
+APP_MISSING = """<!doctype html><meta charset="utf-8"><title>CiteCheck</title>
+<body style="font-family:system-ui;padding:40px;color:#0f172a">
+<h2>The React workspace has not been built yet</h2>
+<p>Run <code>cd frontend &amp;&amp; npm install &amp;&amp; npm run build</code>, then reload.</p>
+<p>The original demo is still available at <a href="/legacy">/legacy</a>.</p></body>"""
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    from citecheck.tasks.indexer import requeue_unfinished
+
+    requeue_unfinished()
+    yield
+
+
+app = FastAPI(title="CiteCheck", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+app.include_router(api_router)
+app.include_router(public_router)
 
 
 class AskBody(BaseModel):
@@ -25,8 +45,30 @@ class AskBody(BaseModel):
 
 
 @app.get("/")
-def index() -> FileResponse:
+def index() -> RedirectResponse:
+    return RedirectResponse("/app/")
+
+
+@app.get("/legacy")
+def legacy() -> FileResponse:
     return FileResponse(STATIC / "index.html")
+
+
+@app.get("/app")
+@app.get("/app/{path:path}")
+def workspace(path: str = "") -> Response:
+    dist = config.settings.frontend_dist
+    index_file = dist / "index.html"
+    if not index_file.exists():
+        return HTMLResponse(APP_MISSING, status_code=503)
+    if path:
+        candidate = (dist / path).resolve()
+        if dist.resolve() in candidate.parents and candidate.is_file():
+            cache = "public, max-age=31536000, immutable" if path.startswith("assets/") else "no-cache"
+            return FileResponse(candidate, headers={"Cache-Control": cache})
+        if path.startswith("assets/"):
+            raise HTTPException(status_code=404)
+    return FileResponse(index_file, headers={"Cache-Control": "no-cache"})
 
 
 @app.post("/api/library")
@@ -81,7 +123,10 @@ def _read_uploads(files: list[UploadFile]) -> list[tuple[str, bytes]]:
         name = upload.filename or "paper.pdf"
         if Path(name).suffix.lower() != ".pdf":
             continue
-        payloads.append((name, upload.file.read()))
+        data = upload.file.read(config.settings.max_upload_bytes + 1)
+        if len(data) > config.settings.max_upload_bytes:
+            raise HTTPException(status_code=413, detail={"code": "file_too_large"})
+        payloads.append((name, data))
     return payloads
 
 

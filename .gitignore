@@ -1,8 +1,11 @@
 .env
 .venv/
 PROPOSAL.md
-IMPLEMENTATION_PLAN.md
+/IMPLEMENTATION_PLAN.md
 __pycache__/
 *.pyc
 .DS_Store
 data/
+frontend/node_modules/
+frontend/dist/
+dist/

@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 
+PROVIDERS = ("llm", "teamily")
+
 
 @dataclass
 class TokenUsage:
@@ -33,6 +35,7 @@ class LLMClient:
 
     model: str
     client: object
+    provider: str = "llm"
     usage: TokenUsage = field(default_factory=TokenUsage)
 
     def complete(
@@ -92,24 +95,100 @@ def parse_json(text: str) -> dict:
     return value
 
 
-def load_settings() -> dict[str, str]:
-    """Read LLM settings from the environment and the repo-root `.env`."""
+def _teamily_openai_base(url: str) -> tuple[str, str]:
+    """Turn an agent /responses URL into OpenAI SDK base_url + model id when needed."""
+    cleaned = url.strip().rstrip("/")
+    match = re.search(r"(https://[^/]+/v1)/agents/([^/]+)", cleaned)
+    if match:
+        return match.group(1), match.group(2)
+    if cleaned.endswith("/responses"):
+        cleaned = cleaned[: -len("/responses")].rstrip("/")
+    if "/agents/" in cleaned:
+        root, _, agent = cleaned.partition("/agents/")
+        return root.rstrip("/") or "https://teamily.ai/v1", agent.split("/")[0]
+    return cleaned or "https://teamily.ai/v1", ""
+
+
+def _read_env() -> None:
     load_dotenv(ROOT / ".env")
-    return {
-        "base_url": os.getenv("LLM_BASE_URL", "https://api.openai.com/v1").strip(),
-        "api_key": os.getenv("LLM_API_KEY", "").strip(),
-        "model": os.getenv("LLM_MODEL", "gpt-4o-mini").strip(),
-    }
 
 
-def from_env() -> LLMClient:
-    """Build a client from `LLM_BASE_URL`, `LLM_API_KEY`, and `LLM_MODEL`."""
-    settings = load_settings()
-    if not settings["api_key"]:
-        raise RuntimeError(
-            "LLM_API_KEY is empty. Copy .env.example to .env and set the key."
+def provider_settings(provider: str) -> dict[str, str]:
+    """Env-backed settings for one provider id (`llm` or `teamily`). Keys may be empty."""
+    _read_env()
+    name = provider.strip().lower()
+    if name == "teamily":
+        raw_url = os.getenv("AI_BASE_URL", "https://teamily.ai/v1").strip()
+        base_url, agent_id = _teamily_openai_base(raw_url)
+        return {
+            "provider": "teamily",
+            "base_url": base_url,
+            "api_key": os.getenv("AI_API_KEY", "").strip(),
+            "model": os.getenv("AI_MODEL", "").strip() or agent_id or "teamily",
+        }
+    if name == "llm":
+        return {
+            "provider": "llm",
+            "base_url": os.getenv("LLM_BASE_URL", "https://api.openai.com/v1").strip(),
+            "api_key": os.getenv("LLM_API_KEY", "").strip(),
+            "model": os.getenv("LLM_MODEL", "gpt-4o-mini").strip(),
+        }
+    raise ValueError(f"Unknown provider: {provider}")
+
+
+def provider_configured(provider: str) -> bool:
+    return bool(provider_settings(provider)["api_key"])
+
+
+def default_provider() -> str:
+    """CLI / new-user default: `AI_PROVIDER` when configured, else first configured provider."""
+    _read_env()
+    hint = os.getenv("AI_PROVIDER", "").strip().lower()
+    if hint in PROVIDERS and provider_configured(hint):
+        return hint
+    for name in PROVIDERS:
+        if provider_configured(name):
+            return name
+    return "llm"
+
+
+def list_providers() -> list[dict]:
+    items: list[dict] = []
+    for name in PROVIDERS:
+        settings = provider_settings(name)
+        items.append(
+            {
+                "id": name,
+                "model": settings["model"],
+                "configured": bool(settings["api_key"]),
+            }
         )
+    return items
+
+
+def load_settings() -> dict[str, str]:
+    """Active provider settings (default provider). Used by health checks and CLI."""
+    provider = default_provider()
+    return provider_settings(provider)
+
+
+def from_provider(provider: str) -> LLMClient:
+    """Build a client for `llm` or `teamily`."""
+    settings = provider_settings(provider)
+    if not settings["api_key"]:
+        if provider == "teamily":
+            raise RuntimeError("AI_API_KEY is empty. Add Teamily credentials to .env.")
+        raise RuntimeError("LLM_API_KEY is empty. Copy .env.example to .env and set the key.")
     from openai import OpenAI
 
     client = OpenAI(base_url=settings["base_url"], api_key=settings["api_key"])
-    return LLMClient(model=settings["model"], client=client)
+    return LLMClient(
+        model=settings["model"],
+        client=client,
+        provider=settings["provider"],
+    )
+
+
+def from_env() -> LLMClient:
+    """Build a client using the default provider."""
+    return from_provider(default_provider())

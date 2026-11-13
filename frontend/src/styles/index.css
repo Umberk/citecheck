@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme="light"] {
+  --canvas: 246 247 249;
+  --surface: 255 255 255;
+  --subtle: 241 243 246;
+  --muted: 233 236 241;
+  --line: 228 231 236;
+  --line-strong: 208 213 221;
+
+  --ink: 15 23 42;
+  --ink-2: 51 65 85;
+  --ink-3: 100 116 139;
+  --ink-4: 148 163 184;
+
+  --brand-50: 239 243 255;
+  --brand-100: 222 230 253;
+  --brand-200: 190 205 250;
+  --brand-500: 52 87 214;
+  --brand-600: 29 63 174;
+  --brand-700: 24 50 140;
+  --brand-900: 15 28 77;
+
+  --ok: 18 128 92;
+  --ok-soft: 231 246 239;
+  --warn: 181 71 8;
+  --warn-soft: 254 244 230;
+  --bad: 200 45 32;
+  --bad-soft: 254 236 235;
+  --info: 2 106 162;
+  --info-soft: 230 244 252;
+
+  --highlight: 255 214 74;
+  --highlight-focus: 52 87 214;
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 6px 16px -4px rgb(15 23 42 / 0.1), 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  --shadow-lg: 0 18px 40px -12px rgb(15 23 42 / 0.18), 0 4px 10px -4px rgb(15 23 42 / 0.08);
+  --shadow-focus: 0 0 0 3px rgb(52 87 214 / 0.18);
+
+  --sidebar-width: 232px;
+  --topbar-height: 52px;
+}
+
+/* Dark palette is reserved for a later pass; values keep contrast if toggled. */
+[data-theme="dark"] {
+  --canvas: 13 17 26;
+  --surface: 20 25 36;
+  --subtle: 27 33 46;
+  --muted: 36 43 58;
+  --line: 43 51 68;
+  --line-strong: 61 71 92;
+  --ink: 236 240 247;
+  --ink-2: 200 208 222;
+  --ink-3: 146 158 180;
+  --ink-4: 104 116 140;
+  --brand-50: 23 33 66;
+  --brand-100: 30 45 92;
+  --brand-200: 52 74 140;
+  --brand-500: 110 142 245;
+  --brand-600: 128 158 250;
+  --brand-700: 170 192 255;
+  --brand-900: 220 230 255;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--canvas));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgb(var(--brand-500) / 0.22);
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--line-strong)) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgb(var(--line-strong));
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-solid border-line bg-surface shadow-xs;
+  }
+  .card-hover {
+    @apply transition-[box-shadow,border-color,transform] duration-150 hover:border-line-strong hover:shadow-sm;
+  }
+  .section-title {
+    @apply text-sm font-semibold text-ink;
+  }
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.06em] text-ink-3;
+  }
+  .kbd {
+    @apply inline-flex h-5 min-w-5 items-center justify-center rounded-sm border border-solid border-line bg-subtle px-1 font-mono text-2xs text-ink-3;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-sm px-1.5 py-px text-2xs font-medium;
+  }
+  .nav-item {
+    @apply flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm text-ink-2 transition-colors duration-100 hover:bg-muted hover:text-ink;
+  }
+  .nav-item-active {
+    @apply bg-surface text-ink shadow-xs ring-1 ring-line;
+  }
+  .icon-btn {
+    @apply inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-ink-3 transition-colors hover:bg-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-40;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+/* PDF viewer */
+.pdf-page {
+  position: relative;
+  margin: 0 auto;
+  background: white;
+  box-shadow: var(--shadow-md);
+  border-radius: 2px;
+}
+.pdf-page .react-pdf__Page__canvas {
+  border-radius: 2px;
+}
+.pdf-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.pdf-mark {
+  position: absolute;
+  border-radius: 2px;
+  background: rgb(var(--highlight) / 0.38);
+  mix-blend-mode: multiply;
+  transition: background-color 200ms ease;
+}
+.pdf-mark.is-focus {
+  background: rgb(var(--highlight-focus) / 0.22);
+  box-shadow: inset 0 -2px 0 rgb(var(--highlight-focus) / 0.8);
+}
+.pdf-mark.is-flash {
+  animation: markFlash 1.2s ease-out 1;
+}
+@keyframes markFlash {
+  0% {
+    background: rgb(var(--highlight) / 0.95);
+  }
+  100% {
+    background: rgb(var(--highlight) / 0.38);
+  }
+}
+.pdf-page .textLayer {
+  z-index: 2;
+}
+.pdf-page .textLayer mark.search-hit {
+  background: rgb(255 170 0 / 0.45);
+  color: transparent;
+  border-radius: 2px;
+}
+.pdf-page-flash {
+  border-radius: 2px;
+  animation: pageFlash 1.6s ease-out 1 both;
+}
+@keyframes pageFlash {
+  0% {
+    box-shadow: 0 0 0 3px rgb(var(--brand-500) / 0.7);
+    background: rgb(var(--brand-500) / 0.06);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgb(var(--brand-500) / 0.18);
+    background: rgb(var(--brand-500) / 0);
+  }
+}
+
+/* Ant Design touch-ups that tokens cannot reach */
+.ant-segmented {
+  font-weight: 500;
+}
+.ant-tabs-nav::before {
+  border-bottom-color: rgb(var(--line)) !important;
+}
+.ant-btn {
+  box-shadow: none !important;
+}
+.ant-upload-wrapper .ant-upload-drag {
+  background: rgb(var(--subtle)) !important;
+  border-color: rgb(var(--line-strong)) !important;
+}
+.ant-upload-wrapper .ant-upload-drag:hover {
+  border-color: rgb(var(--brand-500)) !important;
+}
+.ant-table-wrapper .ant-table-thead > tr > th {
+  font-weight: 500 !important;
+  color: rgb(var(--ink-3)) !important;
+  font-size: 12px;
+}

@@ -47,13 +47,16 @@ python -m citecheck.ask \
 
 `--system` accepts `b1`, `b2`, `b3`, `full`, `no_planner`, `embedding_only`, and `no_verifier`.
 
-Demo page:
+Web workspace:
 
 ```bash
+cd frontend && npm install && npm run build && cd ..
 python -m citecheck.web
 ```
 
-Open http://127.0.0.1:8000 . Upload PDFs or use the sample papers. The page shows the answer, the check for each sentence, section and page citations, the retrieval trace, and the retrieved passages. The header switches the interface between Chinese and English.
+Open http://127.0.0.1:8000 . It redirects to `/app`. Register, upload a PDF or import the sample papers, ask in the AI Reader, and click a citation to jump back into the PDF. `/legacy` is the original single-page demo. The header switches between Chinese and English.
+
+PDFs are stored under `data/` unless Tencent Cloud COS is configured with `COS_SECRET_ID`, `COS_SECRET_KEY`, `COS_BUCKET`, and `COS_REGION`. Keys stay on the server. Uploads default to 20MB, and one PDF is parsed at a time. See [docs/DEPLOY.md](docs/DEPLOY.md) for the server and [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for the demo order.
 
 ## Comparisons
 

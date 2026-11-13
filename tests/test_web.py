@@ -58,8 +58,13 @@ class DemoApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["detail"]["code"], "need_pdf")
 
-    def test_page_is_served(self) -> None:
-        response = self.client.get("/")
+    def test_root_redirects_to_the_workspace(self) -> None:
+        response = self.client.get("/", follow_redirects=False)
+        self.assertIn(response.status_code, {302, 307})
+        self.assertEqual(response.headers["location"], "/app/")
+
+    def test_legacy_page_is_served(self) -> None:
+        response = self.client.get("/legacy")
         self.assertEqual(response.status_code, 200)
         self.assertIn("CiteCheck", response.text)
         self.assertIn('id="library-sidebar"', response.text)
