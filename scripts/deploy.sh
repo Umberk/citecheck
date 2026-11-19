@@ -124,9 +124,12 @@ ensure_dirs() {
 setup_venv() {
   local py
   py="$(find_python)"
-  if [[ ! -d "$VENV" ]]; then
+  if [[ ! -d "$VENV" ]] || [[ ! -x "$VENV/bin/python" ]]; then
+    [[ -d "$VENV" ]] && rm -rf "$VENV"
     log "创建虚拟环境 ($py)"
-    "$py" -m venv "$VENV"
+    if ! "$py" -m venv "$VENV"; then
+      die "无法创建 venv。Ubuntu/Debian 请执行: apt install -y python3.12-venv python3.12-dev && rm -rf .venv 后重试"
+    fi
   fi
   # shellcheck disable=SC1091
   source "$VENV/bin/activate"

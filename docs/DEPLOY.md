@@ -4,7 +4,7 @@
 
 ## 服务器上需要的软件
 
-- Python 3.12
+- Python 3.12，Ubuntu 还需：`apt install -y python3.12-venv python3.12-dev`
 - Node.js 20 或更新，只在构建前端时需要
 - Nginx（宝塔自带）做反向代理与 HTTPS
 - 不需要 PostgreSQL、Redis、Celery
