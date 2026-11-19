@@ -19,7 +19,7 @@ USE_SYSTEMD=0
 USE_HTTPS=0
 SKIP_FRONTEND=0
 DO_PULL=0
-CMD="${1:-deploy}"
+CMD="deploy"
 
 usage() {
   cat <<'EOF'
@@ -338,8 +338,7 @@ main() {
       print_status
       ;;
     *)
-      usage
-      exit 1
+      die "未知命令: $CMD（使用 --help）"
       ;;
   esac
 }
