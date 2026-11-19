@@ -4,7 +4,7 @@ import { GitMerge, Route as RouteIcon, ShieldCheck } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { Locale } from "../api/types";
-import { Logo } from "../components/Logo";
+import { Logo, LogoMark } from "../components/Logo";
 import { useT } from "../i18n";
 import { errorText } from "../lib/errors";
 import { useAuth } from "../stores/auth";
@@ -18,6 +18,7 @@ interface FormValues {
 
 function Pitch() {
   const t = useT();
+  const locale = usePrefs((state) => state.locale);
   const points = [
     { icon: RouteIcon, text: t("auth.pitch.p1") },
     { icon: GitMerge, text: t("auth.pitch.p2") },
@@ -35,33 +36,37 @@ function Pitch() {
       />
       <div className="relative">
         <span className="inline-flex items-center gap-2 text-[15px] font-semibold">
-          <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
-            <rect width="32" height="32" rx="8" fill="#fff" fillOpacity="0.12" />
-            <path d="M20.6 10.2a8 8 0 1 0 0 11.6" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
-            <path d="m15.6 16 2.6 2.6 5-5.8" fill="none" stroke="#9fb7ff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <LogoMark size={28} variant="transparent" />
           CiteCheck
         </span>
       </div>
-      <div className="relative max-w-md">
-        <h2 className="text-3xl font-semibold leading-tight tracking-tight">{t("auth.pitch.title")}</h2>
-        <p className="mt-3 text-md text-white/70">{t("auth.pitch.desc")}</p>
-        <ul className="mt-8 flex list-none flex-col gap-3 p-0">
-          {points.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 text-sm text-white/85">
-              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/10">
-                <Icon size={16} />
-              </span>
-              {text}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-10 rounded-lg border border-solid border-white/10 bg-white/5 p-4 font-mono text-xs leading-6 text-white/75">
-          <div>
-            PDF → <span className="text-[#9fb7ff]">section chunks</span> → plan → BM25 + embedding → RRF
-          </div>
-          <div>
-            draft → <span className="text-[#9fb7ff]">verify each sentence</span> → cited answer
+      <div className="relative flex flex-1 items-center justify-center">
+        <div className="w-full max-w-md">
+          <h2
+            className={`text-center text-3xl font-semibold leading-tight tracking-tight ${
+              locale === "zh" ? "whitespace-nowrap" : "text-balance"
+            }`}
+          >
+            {t("auth.pitch.title")}
+          </h2>
+          <p className="mt-3 text-md text-white/70">{t("auth.pitch.desc")}</p>
+          <ul className="mt-8 flex list-none flex-col gap-3 p-0">
+            {points.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-sm text-white/85">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/10">
+                  <Icon size={16} />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-10 rounded-lg border border-solid border-white/10 bg-white/5 p-4 font-mono text-xs leading-6 text-white/75">
+            <div>
+              PDF → <span className="text-[#9fb7ff]">section chunks</span> → plan → BM25 + embedding → RRF
+            </div>
+            <div>
+              draft → <span className="text-[#9fb7ff]">verify each sentence</span> → cited answer
+            </div>
           </div>
         </div>
       </div>

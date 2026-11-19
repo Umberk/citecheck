@@ -106,13 +106,13 @@ export default function HistoryPage() {
           />
         </div>
       ) : (
-        <div className="grid min-h-[560px] grid-cols-1 gap-4 lg:grid-cols-[minmax(320px,2fr)_3fr]">
-          <div className="card flex flex-col overflow-hidden">
-            <div className="flex h-11 items-center border-0 border-b border-solid border-line px-4 text-xs text-ink-3">
+        <div className="grid h-[calc(100dvh-var(--topbar-height)-11.5rem)] min-h-[520px] grid-cols-1 gap-4 lg:grid-cols-[minmax(320px,2fr)_3fr]">
+          <div className="card flex min-h-0 min-w-0 flex-col overflow-hidden">
+            <div className="flex h-11 shrink-0 items-center border-0 border-b border-solid border-line px-4 text-xs text-ink-3">
               {t("hist.messages", { n: conversations.reduce((sum, item) => sum + item.message_count, 0) })} ·{" "}
               {conversations.length}
             </div>
-            <ul className="scroll-thin m-0 max-h-[calc(100vh-260px)] list-none overflow-y-auto p-1.5">
+            <ul className="scroll-thin m-0 min-h-0 flex-1 list-none overflow-y-auto p-1.5">
               {conversations.map((conversation) => (
                 <li key={conversation.id}>
                   <button
@@ -148,7 +148,7 @@ export default function HistoryPage() {
             </ul>
           </div>
 
-          <div className="card flex min-h-0 flex-col overflow-hidden">
+          <div className="card flex min-h-0 min-w-0 flex-col overflow-hidden">
             {!selectedId ? (
               <EmptyState compact title={t("hist.selectOne")} />
             ) : detailLoading && !detail ? (
@@ -159,7 +159,7 @@ export default function HistoryPage() {
               <ErrorState error={detailError} />
             ) : detail ? (
               <>
-                <div className="flex items-center gap-3 border-0 border-b border-solid border-line px-4 py-2.5">
+                <div className="flex shrink-0 items-center gap-3 border-0 border-b border-solid border-line px-4 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-ink">{detail.title}</p>
                     <p className="text-2xs text-ink-4">{formatDate(detail.created_at, locale, true)}</p>
@@ -182,20 +182,23 @@ export default function HistoryPage() {
                     {t("hist.continue")} <ArrowRight size={13} />
                   </Button>
                 </div>
-                <div className="scroll-thin flex max-h-[calc(100vh-260px)] flex-col gap-3 overflow-y-auto bg-canvas/50 p-4">
+                <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto bg-canvas/50 p-4">
                   {detail.messages.map((item) =>
                     item.role === "user" ? (
-                      <div key={item.id} className="flex justify-end">
-                        <p className="max-w-[80%] rounded-lg rounded-br-sm bg-brand-600 px-3 py-2 text-sm text-white">{item.content}</p>
+                      <div key={item.id} className="flex shrink-0 justify-end">
+                        <p className="max-w-[80%] whitespace-pre-wrap break-words rounded-lg rounded-br-sm bg-brand-600 px-3 py-2 text-sm text-white">
+                          {item.content}
+                        </p>
                       </div>
                     ) : item.payload ? (
-                      <AnswerCard
-                        key={item.id}
-                        payload={item.payload}
-                        active={false}
-                        onLocate={() => open(detail)}
-                        onShow={() => open(detail)}
-                      />
+                      <div key={item.id} className="min-w-0 shrink-0">
+                        <AnswerCard
+                          payload={item.payload}
+                          active={false}
+                          onLocate={() => open(detail)}
+                          onShow={() => open(detail)}
+                        />
+                      </div>
                     ) : null,
                   )}
                 </div>

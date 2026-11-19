@@ -1,17 +1,24 @@
-export function LogoMark({ size = 28 }: { size?: number }) {
+const logoMark = `${import.meta.env.BASE_URL}logo-mark.png`;
+const logoTile = `${import.meta.env.BASE_URL}logo-icon-512.png`;
+
+export function LogoMark({
+  size = 28,
+  variant = "tile",
+}: {
+  size?: number;
+  variant?: "tile" | "transparent";
+}) {
+  const src = variant === "transparent" ? logoMark : logoTile;
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill="rgb(var(--brand-600))" />
-      <path d="M20.6 10.2a8 8 0 1 0 0 11.6" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
-      <path
-        d="m15.6 16 2.6 2.6 5-5.8"
-        fill="none"
-        stroke="#9fb7ff"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <img
+      src={src}
+      width={size}
+      height={size}
+      alt=""
+      aria-hidden="true"
+      className="shrink-0 rounded-lg object-cover"
+      draggable={false}
+    />
   );
 }
 

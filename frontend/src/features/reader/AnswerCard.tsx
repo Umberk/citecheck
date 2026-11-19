@@ -97,7 +97,7 @@ export function AnswerCard({
   const hidden = payload.claims.length - supported.length;
 
   return (
-    <div className={`card overflow-hidden transition-shadow ${active ? "ring-1 ring-brand-200" : ""}`}>
+    <div className={`card min-w-0 shrink-0 overflow-hidden transition-shadow ${active ? "ring-1 ring-brand-200" : ""}`}>
       <div className="flex items-center gap-2 border-0 border-b border-solid border-line bg-subtle/60 px-3.5 py-2">
         <span className="chip bg-brand-600 font-mono uppercase text-white">{payload.system}</span>
         <span className="text-xs font-medium text-ink-2">{t("reader.answer")}</span>
@@ -112,7 +112,7 @@ export function AnswerCard({
         </span>
       </div>
 
-      <div className="px-3.5 py-3 text-[14.5px] leading-[24px] text-ink">
+      <div className="break-words px-3.5 py-3 text-[14.5px] leading-[24px] text-ink">
         {payload.verify ? (
           supported.length > 0 ? (
             <p>

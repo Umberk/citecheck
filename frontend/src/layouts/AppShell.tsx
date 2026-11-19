@@ -10,7 +10,7 @@ import {
   Library,
   LogOut,
   Menu,
-  MonitorSmartphone,
+  // MonitorSmartphone,
   Plus,
   Settings,
 } from "lucide-react";
@@ -118,12 +118,14 @@ function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate
 
       <div className={`flex flex-col gap-0.5 border-0 border-t border-solid border-line py-3 ${collapsed ? "px-2" : "px-3"}`}>
         <NavList entries={[{ to: "/settings", key: "nav.settings", icon: Settings }]} collapsed={collapsed} onNavigate={onNavigate} />
+        {/* 旧版演示页暂不展示
         {!collapsed && (
           <a href="/legacy" className="nav-item text-ink-3">
             <MonitorSmartphone size={16} className="text-ink-4" />
             <span className="truncate">{t("nav.legacy")}</span>
           </a>
         )}
+        */}
         <Dropdown
           trigger={["click"]}
           placement="topLeft"
